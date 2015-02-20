@@ -1,3 +1,9 @@
+def hdi_of_icdf(dist, cred_mass=0.95):
+    alpha = 1.0 - cred_mass
+    l, u = dist.ppf(alpha/2), dist.ppf(1 - alpha/2)
+    return (l, u)
+
+
 def beta_ab_from_mean_kappa(mean, kappa):
     if mean <= 0 or mean >= 1:
        raise Exception("must have 0 < mean < 1")
