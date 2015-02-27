@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def hdi_of_icdf(dist, cred_mass=0.95):
     alpha = 1.0 - cred_mass
     l, u = dist.ppf(alpha/2), dist.ppf(1 - alpha/2)
@@ -35,3 +38,23 @@ def beta_ab_from_mean_sd(mean, sd):
     a = mean * kappa
     b = (1.0 - mean) * kappa
     return {"a": a, "b": b}
+
+
+def autocorr(data, lag=1):
+    """Autocorrelation function"""
+    left_window = data[:-lag]
+    right_window = data[lag:]
+    corr_matrix = np.corrcoef(np.array([left_window, right_window]))
+    return corr_matrix[0, 1]
+
+
+def effective_sample_size(data, max_lag=1000, min_acf=0.05):
+    N = len(data)
+    sum_acf = autocorr(data)
+
+    for lag in xrange(2, max_lag):
+        sum_acf += autocorr(data, lag)
+        if sum_acf < 0.05:
+            break
+
+    return N/(1 + 2*sum_acf)
